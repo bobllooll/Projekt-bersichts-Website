@@ -1,29 +1,129 @@
 :root {
-    --primary: #6366f1;
-    --primary-glow: rgba(99, 102, 241, 0.4);
-    --bg-color: #f8fafc;
-    --card-bg: rgba(255, 255, 255, 0.65);
-    --card-border: rgba(255, 255, 255, 0.8);
-    --text-color: #1e293b;
-    --text-muted: #64748b;
-    --blob-1: #a5b4fc;
-    --blob-2: #fbcfe8;
-    --blob-3: #c4b5fd;
+    --primary: #d946ef; /* Electric Purple / Fuchsia */
+    --primary-glow: rgba(217, 70, 239, 0.5);
+    --bg-color: #050505; /* Deepest Black */
+    --card-bg: #0a0a0a;
+    --card-border: #1f1f1f;
+    --text-color: #ffffff;
+    --text-muted: #9ca3af;
+    --blob-1: #581c87; /* Dark Purple */
+    --blob-2: #701a75; /* Dark Pink */
+    --blob-3: #2e1065; /* Deep Violet */
+}
+
+/* --- Custom Scrollbar (High-End Look) --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* --- Cinematic Preloader --- */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 20000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 5rem;
+    font-weight: 800;
+    font-style: italic;
+    transition: transform 0.8s cubic-bezier(0.8, 0, 0.2, 1);
+}
+
+.preloader.finished {
+    transform: translateY(-100%);
 }
 
 body {
-    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
-    padding: 60px 20px;
+    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
     box-sizing: border-box;
     overflow-x: hidden; /* Wichtig für Background Blobs */
-    position: relative;
+    /* Grid Lines Background */
+    background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 100px 100px;
+    animation: gridMove 20s linear infinite;
+}
+
+/* --- Vignette (Fokus auf die Mitte) --- */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 9000;
+}
+
+/* --- Scanlines (High-Tech TV Effekt) --- */
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+    background-size: 100% 4px;
+    z-index: 9998; /* Unter Noise, über Content */
+    pointer-events: none;
+    opacity: 0.25;
+    animation: flicker 4s infinite; /* Simuliert alte Leuchtreklame/Monitor */
+}
+
+@keyframes flicker {
+    0% { opacity: 0.25; }
+    5% { opacity: 0.15; }
+    10% { opacity: 0.25; }
+    15% { opacity: 0.1; }
+    20% { opacity: 0.25; }
+    50% { opacity: 0.2; }
+    55% { opacity: 0.3; }
+    60% { opacity: 0.25; }
+    100% { opacity: 0.25; }
+}
+
+@keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 100px 100px; }
+}
+
+/* --- Noise Overlay (Kunst-Effekt) --- */
+.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04; /* Subtileres, statisches Grain */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 /* --- Hintergrund Animation (Aurora) --- */
@@ -42,7 +142,7 @@ body {
     position: absolute;
     border-radius: 50%;
     filter: blur(80px);
-    opacity: 0.6;
+    opacity: 0.4;
     animation: float 20s infinite alternate ease-in-out;
 }
 
@@ -73,13 +173,66 @@ body {
     animation-delay: -10s;
 }
 
+/* --- Marquee (Laufschrift Hintergrund) --- */
+.marquee-wrapper {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    transform: translateY(-50%) rotate(-5deg) scale(1.2);
+    z-index: -2; /* Ganz hinten */
+    opacity: 0.1; /* Deutlicher sichtbar, damit man den Text erkennt */
+    filter: blur(0px); /* Kein Blur mehr für klare Lesbarkeit */
+    pointer-events: none;
+    overflow: hidden;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.marquee-content {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15vh;
+    font-weight: 800;
+    font-style: italic;
+    color: transparent;
+    -webkit-text-stroke: 2px #fff;
+    display: inline-block;
+    /* Animation wird jetzt via JS gesteuert für Richtungswechsel */
+    will-change: transform;
+}
+
 header {
     text-align: center;
-    margin-bottom: 80px;
-    max-width: 800px;
+    min-height: 90vh; /* Fast Fullscreen für dramatischen Einstieg */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    max-width: 1000px;
     width: 100%;
     position: relative;
-    animation: fadeIn 0.8s ease-out;
+    padding: 0 20px 80px 20px; /* Platz für Scroll Indicator unten */
+    z-index: 10;
+}
+
+/* Scroll Down Indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
+    40% {transform: translateX(-50%) translateY(-10px);}
+    60% {transform: translateX(-50%) translateY(-5px);}
 }
 
 /* --- Profil Sektion --- */
@@ -105,26 +258,45 @@ header {
 }
 
 .profile-img {
-    width: 120px;
-    height: 120px;
+    width: 140px; /* Etwas größer für mehr Präsenz */
+    height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--card-bg);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    filter: none;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* Hover Effekt für Profilbild */
 .profile-link:hover .profile-img {
     transform: scale(1.02);
-    border-color: #5865F2; /* Discord Farbe */
+    box-shadow: 0 0 30px var(--primary-glow);
+    filter: brightness(0.4) blur(2px); /* Bild abdunkeln für Icon */
+}
+
+/* Telefon Icon Overlay */
+.profile-hover-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+    color: #fff;
+}
+
+.profile-link:hover .profile-hover-icon {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
 }
 
 /* Das kleine Discord Logo Badge */
 .discord-brand-badge {
     position: absolute;
-    top: -5px;
-    left: -5px;
+    top: -8px;
+    left: -8px;
     width: 32px;
     height: 32px;
     background-color: #5865F2; /* Discord Blurple */
@@ -132,7 +304,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid var(--bg-color);
+    border: none; /* Retro Strich entfernt */
     color: white;
     box-shadow: 0 4px 10px rgba(88, 101, 242, 0.4);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -140,18 +312,18 @@ header {
 }
 
 .profile-link:hover .discord-brand-badge {
-    transform: scale(1.2) rotate(-10deg);
+    transform: scale(1.1) rotate(-10deg);
 }
 
 /* Pulsierender Status Punkt */
 .status-badge {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
-    width: 20px;
-    height: 20px;
+    bottom: 5px;
+    right: 5px;
+    width: 18px;
+    height: 18px;
     background-color: #2ecc71; /* Grün für Verfügbar */
-    border: 3px solid var(--bg-color);
+    border: none; /* Retro Strich entfernt */
     border-radius: 50%;
     box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
     animation: pulse-green 2s infinite;
@@ -214,7 +386,7 @@ header {
     transition: all 0.2s ease;
     padding: 8px;
     border-radius: 12px;
-    background: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.05);
 }
 
 .social-links a:hover {
@@ -224,19 +396,30 @@ header {
 }
 
 h1 {
-    font-size: 3.5rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(4rem, 12vw, 9rem); /* Noch größer für den Lando-Look */
     font-weight: 800;
-    margin-bottom: 16px;
-    color: var(--text-color);
-    letter-spacing: -0.03em;
-    background: linear-gradient(135deg, var(--text-color) 0%, var(--primary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-style: italic; /* Racing/Speed Look wie bei Lando */
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    color: #fff;
+    /* Subtiler Lila Schein hinter dem Text */
+    text-shadow: 0 0 60px rgba(217, 70, 239, 0.4);
+    display: inline-block;
+    /* Elegante Reveal Animation statt Hacker Effekt */
+    opacity: 0;
+    animation: titleReveal 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s forwards;
+}
+
+@keyframes titleReveal {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 p {
-    color: var(--text-muted);
+    color: #cbd5e1;
     font-size: 1.25rem;
     line-height: 1.6;
     margin: 0;
@@ -244,60 +427,187 @@ p {
 }
 
 .project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Kleinerer Gap, da Karten größer sind */
     width: 100%;
-    max-width: 1100px;
+    max-width: 1200px; /* Widescreen Layout */
     position: relative;
+    padding: 0 20px 100px 20px;
 }
 
 .project-card {
     background: var(--card-bg);
-    backdrop-filter: blur(16px); /* Der Glass-Effekt */
-    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--card-border);
-    border-radius: 24px;
-    padding: 32px;
+    border-radius: 4px; /* Fast eckig für den "Brutalist/Tech" Look */
+    padding: 40px;
     text-decoration: none;
-    color: inherit;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy transition */
+    color: var(--text-color);
+    position: relative;
+    --theme-color: var(--primary); /* Fallback, wird per JS überschrieben */
+    /* overflow: hidden; Entfernt, damit Tech-Bracket Border sichtbar ist */
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row; /* Horizontal Layout */
+    align-items: center;
+    gap: 30px;
+    
+    /* Initial State für Scroll Animation */
     opacity: 0; /* Für Animation */
-    animation: slideUp 0.6s ease-out forwards;
+    transform: translateY(50px) scale(0.95);
+    /* Filter Drop-Shadow erlaubt uns später Clip-Path zu nutzen ohne Schatten zu verlieren */
+    transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+    
+    /* Subtiles Grid im Hintergrund der Karte */
+    background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    
+    /* Statischer Flicker auf dem Border (sehr subtil) */
+    animation: border-flicker 4s infinite;
 }
 
-.project-card:nth-child(1) { animation-delay: 0.2s; }
-.project-card:nth-child(2) { animation-delay: 0.4s; }
-.project-card:nth-child(3) { animation-delay: 0.6s; }
-.project-card:nth-child(4) { animation-delay: 0.8s; }
-.project-card:nth-child(5) { animation-delay: 1.0s; }
+@keyframes border-flicker {
+    0%, 100% { border-color: var(--card-border); }
+    50% { border-color: rgba(255, 255, 255, 0.15); }
+    52% { border-color: var(--card-border); }
+    54% { border-color: rgba(255, 255, 255, 0.15); }
+    56% { border-color: var(--card-border); }
+    90% { border-color: var(--card-border); }
+    92% { border-color: rgba(255, 255, 255, 0.1); }
+    94% { border-color: var(--card-border); }
+}
+
+/* --- Alternating Layout (Zick-Zack) --- */
+.project-card:nth-child(even) {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+
+.project-card:nth-child(even) .card-number {
+    right: auto;
+    left: -20px;
+}
+
+.project-card:nth-child(even) .btn-link {
+    flex-direction: row-reverse; /* Pfeil links */
+    margin-left: auto;
+    margin-right: 0;
+}
+
+/* Die große Nummer im Hintergrund (jetzt echtes Element für Parallax) */
+.card-number {
+    position: absolute;
+    right: -20px;
+    top: -40px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 12rem;
+    font-weight: 800;
+    font-style: italic;
+    color: transparent; /* Outline Style */
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.05);
+    z-index: 0;
+    pointer-events: none;
+    transition: color 0.3s ease;
+    line-height: 1;
+}
+
+/* Klasse, die per JS hinzugefügt wird, wenn Element sichtbar ist */
+.project-card.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1) !important; /* Important überschreibt initial transform */
+}
+
+/* Staggered Reveal für Karten-Inhalte (Nacheinander erscheinen) */
+.project-card .card-icon,
+.project-card h2,
+.project-card p,
+.project-card .btn-link {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.project-card.visible .card-icon { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
+.project-card.visible h2 { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+.project-card.visible p { transition-delay: 0.3s; opacity: 1; transform: translateY(0); }
+.project-card.visible .btn-link { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
 
 .project-card:hover {
-    transform: translateY(-12px) scale(1.02);
-    box-shadow: 0 20px 40px var(--primary-glow), 0 0 0 1px var(--primary);
-    background: rgba(255, 255, 255, 0.8);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 80px -20px var(--theme-color);
+    /* Transform wird jetzt via JS gesteuert für smootheren Tilt */
+    z-index: 2;
+}
+
+/* Tech-Bracket Effekt (Ecken-Akzente) */
+.project-card::after {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px; right: -1px; bottom: -1px;
+    border-radius: 5px;
+    background: linear-gradient(45deg, var(--theme-color) 0%, transparent 20%, transparent 80%, var(--theme-color) 100%);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.project-card:hover::after {
+    opacity: 0.5;
+}
+
+.project-card:hover .card-number {
+    -webkit-text-stroke-color: var(--theme-color);
+    opacity: 0.2;
+}
+
+/* Tech ID Badge (z.B. ID: 29A) */
+.tech-id {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-family: 'Inter', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    letter-spacing: 0.1em;
+    background: rgba(0,0,0,0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Spotlight/Glow Effekt Hintergrund */
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), var(--theme-color), transparent 40%);
+    z-index: 0;
+    opacity: 0;
+    filter: opacity(0.1); /* Sehr subtil */
+    transition: opacity 0.3s;
+}
+
+.project-card:hover::before {
+    opacity: 1;
 }
 
 .card-icon {
-    width: 72px;
-    height: 72px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.5); /* Transparenter Hintergrund im Icon */
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    z-index: 1;
+    position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
 }
 
+/* Eleganter Zoom Effekt beim Hover über Icon */
 .project-card:hover .card-icon {
-    transform: scale(1.1) rotate(5deg);
+    border-color: var(--theme-color);
 }
 
 .card-icon img {
@@ -307,26 +617,34 @@ p {
 }
 
 .card-icon svg {
-    color: var(--text-muted);
+    color: #fff;
+}
+
+.card-content {
+    flex-grow: 1;
+    z-index: 1;
 }
 
 .card-content h2 {
-    margin: 0 0 10px 0;
-    font-size: 1.6rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-family: 'Outfit', sans-serif;
+    margin: 0 0 8px 0;
+    font-size: 2rem;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: -0.03em;
+    color: #fff;
 }
 
 .card-content p {
-    margin: 0 0 25px 0;
-    line-height: 1.6;
-    font-size: 1rem;
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+    font-size: 1.1rem;
     color: var(--text-muted);
 }
 
 .btn-link {
-    color: var(--primary);
-    font-weight: 700;
+    color: #fff;
+    font-weight: 600;
     font-size: 1rem;
     display: inline-flex;
     align-items: center;
@@ -335,8 +653,16 @@ p {
     margin-top: auto; /* Drückt den Link nach unten */
 }
 
+/* Magnetic Effect Utility Class */
+.magnetic {
+    display: inline-block;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+
 .project-card:hover .btn-link {
-    gap: 12px;
+    gap: 15px;
+    color: var(--theme-color); /* Neon Farbe beim Hover */
 }
 
 .placeholder {
@@ -354,6 +680,19 @@ p {
     border-color: transparent;
 }
 
+/* Pulsierende Animation für Demnächst-Karte */
+.placeholder {
+    background: transparent;
+    border: 1px dashed #444;
+    box-shadow: none;
+    animation: pulse-card 4s ease-in-out infinite;
+}
+
+@keyframes pulse-card {
+    0%, 100% { border-color: #333; opacity: 0.4; }
+    50% { border-color: var(--primary); opacity: 0.7; box-shadow: 0 0 20px rgba(217, 70, 239, 0.1); }
+}
+
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes float { 
@@ -362,29 +701,31 @@ p {
 }
 
 /* Dark Mode Support (System-Einstellung) */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #0f172a;
-        --card-bg: rgba(30, 41, 59, 0.6);
-        --card-border: rgba(255, 255, 255, 0.1);
-        --text-color: #f1f5f9;
-        --text-muted: #94a3b8;
-        --blob-1: #312e81;
-        --blob-2: #4c1d95;
-        --blob-3: #1e3a8a;
-    }
-    
-    .project-card:hover {
-        background: rgba(30, 41, 59, 0.8);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--primary);
-    }
-}
+/* Wir haben Dark Mode jetzt als Standard gesetzt, daher brauchen wir den Media Query nicht mehr zwingend, 
+   aber wir können ihn nutzen, um Light Mode zu erzwingen, falls gewünscht. 
+   Für den "Lando" Look bleiben wir bei Dark Only. */
 
 /* Mobile Optimierungen */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     body {
+        padding: 0;
+        overflow-x: hidden; /* Verhindert horizontales Wackeln */
+    }
+
+    .project-grid {
+        padding: 0 12px 100px 12px; /* Maximale Breite nutzen (nur 12px Rand) */
+    }
+    
+    .project-card {
+        flex-direction: column;
+        align-items: center; /* Zentriert auf Mobile für besseren Fokus */
         padding: 40px 20px;
-        align-items: stretch; /* Nutzt die volle Breite */
+        text-align: left !important; /* Reset für Mobile */
+        gap: 20px;
+    }
+    
+    .project-card:nth-child(even) .btn-link {
+        margin-left: 0; /* Reset für Mobile */
     }
 
     header {
@@ -393,20 +734,44 @@ p {
     }
 
     h1 {
-        font-size: 2rem;
-    }
-
-    .project-grid {
-        gap: 20px;
+        font-size: 14vw; /* Massiv & Responsive für den "Magazine" Look */
+        line-height: 1;
     }
 
     .project-card {
-        padding: 24px;
         /* Besseres Touch-Feedback */
         transition: transform 0.1s;
     }
     .project-card:active {
         transform: scale(0.98);
+    }
+
+    /* Auf Mobile die Nummern etwas kleiner und transparenter */
+    .card-number {
+        font-size: 6rem;
+        top: -20px;
+        right: 0;
+        opacity: 0.3;
+    }
+    
+    .project-card:nth-child(even) .card-number {
+        left: auto;
+        right: 0;
+    }
+    
+    /* Button volle Breite auf Mobile */
+    .btn-link {
+        width: 100%;
+        justify-content: center;
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    /* Marquee auf Mobile anpassen damit es nicht den Screen sprengt */
+    .marquee-content {
+        font-size: 10vh; 
     }
 }
 
@@ -414,8 +779,8 @@ p {
 .party-mode {
     --bg-color: #050505;
     --text-color: #ffffff;
-    --card-bg: rgba(20, 20, 20, 0.8);
-    --card-border: rgba(255, 255, 255, 0.2);
+    --card-bg: #111;
+    --card-border: #333;
 }
 
 .party-mode .blob {
