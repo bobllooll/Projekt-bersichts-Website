@@ -62,9 +62,20 @@ body {
     min-height: 100vh;
     box-sizing: border-box;
     overflow-x: hidden; /* Wichtig für Background Blobs */
+}
+
+/* --- High-Performance Grid Background --- */
+.grid-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -5;
     /* Grid Lines Background */
     background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
     background-size: 100px 100px;
+    will-change: transform; /* Sagt dem Browser: Bitte auf GPU rendern */
     animation: gridMove 20s linear infinite;
 }
 
@@ -109,8 +120,8 @@ body::after {
 }
 
 @keyframes gridMove {
-    0% { background-position: 0 0; }
-    100% { background-position: 100px 100px; }
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100px); }
 }
 
 /* --- Noise Overlay (Kunst-Effekt) --- */
@@ -397,9 +408,9 @@ header {
 
 h1 {
     font-family: 'Outfit', sans-serif;
-    font-size: clamp(4rem, 12vw, 9rem); /* Noch größer für den Lando-Look */
+    font-size: clamp(4rem, 12vw, 9rem); /* Noch größer für den      -Look */
     font-weight: 800;
-    font-style: italic; /* Racing/Speed Look wie bei Lando */
+    font-style: italic; /* Racing/Speed Look wie bei       */
     text-transform: uppercase;
     margin-bottom: 40px;
     line-height: 0.85;
@@ -667,30 +678,78 @@ p {
 
 .placeholder {
     cursor: default;
+    /* Hologramm Basis-Styles */
+    background: rgba(0, 255, 255, 0.02) !important; /* Überschreibt Card BG */
+    border: 1px solid rgba(0, 255, 255, 0.2) !important;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.05), inset 0 0 20px rgba(0, 255, 255, 0.05) !important;
+    overflow: hidden;
+    animation: hologram-pulse 4s ease-in-out infinite;
 }
 
 .placeholder .card-icon,
 .placeholder .card-content {
-    opacity: 0.6;
+    opacity: 0.7;
+    color: rgba(200, 255, 255, 0.9);
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    z-index: 2;
 }
 
 .placeholder:hover {
-    transform: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    border-color: transparent;
+    border-color: rgba(0, 255, 255, 0.5) !important;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2), inset 0 0 30px rgba(0, 255, 255, 0.1) !important;
 }
 
-/* Pulsierende Animation für Demnächst-Karte */
-.placeholder {
-    background: transparent;
-    border: 1px dashed #444;
-    box-shadow: none;
-    animation: pulse-card 4s ease-in-out infinite;
+/* Scanlines für Hologramm */
+.placeholder::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 255, 255, 0.05) 3px,
+        rgba(0, 255, 255, 0.05) 4px
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 1;
 }
 
-@keyframes pulse-card {
-    0%, 100% { border-color: #333; opacity: 0.4; }
-    50% { border-color: var(--primary); opacity: 0.7; box-shadow: 0 0 20px rgba(217, 70, 239, 0.1); }
+/* Glitch/Shine Balken */
+.placeholder::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to bottom,
+        transparent 45%,
+        rgba(0, 255, 255, 0.1) 50%,
+        transparent 55%
+    );
+    transform: rotate(30deg);
+    animation: hologram-scan 3s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes hologram-scan {
+    0% { transform: translateY(-50%) rotate(30deg); }
+    100% { transform: translateY(50%) rotate(30deg); }
+}
+
+@keyframes hologram-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.8; }
+    92% { opacity: 0.8; transform: translateX(0); }
+    93% { opacity: 0.5; transform: translateX(2px); } /* Mini Glitch */
+    94% { opacity: 0.8; transform: translateX(0); }
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -703,7 +762,7 @@ p {
 /* Dark Mode Support (System-Einstellung) */
 /* Wir haben Dark Mode jetzt als Standard gesetzt, daher brauchen wir den Media Query nicht mehr zwingend, 
    aber wir können ihn nutzen, um Light Mode zu erzwingen, falls gewünscht. 
-   Für den "Lando" Look bleiben wir bei Dark Only. */
+   Für den "     " Look bleiben wir bei Dark Only. */
 
 /* Mobile Optimierungen */
 @media (max-width: 768px) {

@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CINEMATIC PRELOADER ---
     const preloader = document.querySelector('.preloader');
     const counter = document.querySelector('.preloader-counter');
+    const faviconLink = document.querySelector("link[rel~='icon']");
     let count = 0;
     
     // Simulierter Ladevorgang
@@ -38,6 +39,16 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (counter) counter.textContent = count + '%';
         
+        // --- FAVICON ANIMATION (Ladebalken im Tab) ---
+        if (faviconLink) {
+            // Umfang des Rechtecks im SVG (ca. 366px)
+            const perimeter = 366; 
+            const dash = (count / 100) * perimeter;
+            // Wir aktualisieren den SVG-String direkt im href
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23050505' stroke='%23d946ef' stroke-width='6' stroke-dasharray='${dash} 400' /><text x='50' y='75' font-family='sans-serif' font-weight='900' font-size='65' text-anchor='middle' fill='%23ffffff'>H</text></svg>`;
+            faviconLink.href = `data:image/svg+xml,${svg}`;
+        }
+
         if (count === 100) {
             clearInterval(loadInterval);
             setTimeout(() => {
@@ -192,10 +203,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.social-links a, .profile-link').forEach(el => el.classList.add('magnetic'));
         initMagneticElements();
 
-        // 2. Parallax Scroll Effekt
+        // 2. High-Performance Scroll Loop
+        // Wir cachen die Elemente, damit wir sie nicht bei jedem Scroll neu suchen müssen (Performance Boost!)
+        const header = document.querySelector('header');
+        const blobs = document.querySelectorAll('.blob');
+        const projectCards = document.querySelectorAll('.project-card');
+        let lastScrollY = window.scrollY;
+        let scrollTimeout;
+        let ticking = false;
+
         window.addEventListener('scroll', () => {
-            const scrolled = window.scrollY;
-            
+            lastScrollY = window.scrollY;
             // --- MARQUEE SCROLL DIRECTION LOGIC ---
             // Wir steuern die Laufschrift basierend auf der Scroll-Richtung
             const marqueeContent = document.querySelector('.marquee-content');
@@ -235,59 +253,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Diese Logik ist unten im Scroll-Event integriert
             }
 
-            // Hero Section Parallax (Fade out & Slide down)
-            const header = document.querySelector('header');
-            if(header) {
-                header.style.opacity = 1 - (scrolled / 700);
-                header.style.transform = `translateY(${scrolled * 0.4}px) scale(${1 - scrolled/5000})`;
+            // Scroll Velocity für Marquee
+            if (window.marqueeInitialized) {
+                // Wir berechnen Delta hier grob, für Marquee reicht das
+                // Für präzise Physik nutzen wir die Render-Loop
+                window.marqueeTargetSpeed = 3; // Standard Speed bei Bewegung
+                
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    window.marqueeTargetSpeed = 1; // Zurück zu langsam
+                }, 100);
             }
-            
-            // Hintergrund Blobs bewegen (langsam)
-            const blobs = document.querySelectorAll('.blob');
+
+            // Request Animation Frame für visuelle Updates (verhindert Lag)
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    updateScrollVisuals(lastScrollY);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Die optimierte Render-Funktion
+        function updateScrollVisuals(scrolled) {
+            // Hero Parallax
+            if(header) {
+                // Nur berechnen wenn Header noch sichtbar ist (spart CPU)
+                if (scrolled < 1000) {
+                    header.style.opacity = 1 - (scrolled / 700);
+                    header.style.transform = `translateY(${scrolled * 0.4}px) scale(${1 - scrolled/5000})`;
+                }
+            }
+
+            // Blobs Parallax
             blobs.forEach((blob, index) => {
                 const speed = 0.2 + (index * 0.1);
                 blob.style.transform = `translateY(${scrolled * speed}px)`;
             });
 
-            // Kartennummern bewegen (schneller als die Karte selbst -> Tiefe)
-            document.querySelectorAll('.project-card').forEach(card => {
+            // Karten Nummern Parallax (Optimiert)
+            projectCards.forEach(card => {
                 const number = card.querySelector('.card-number');
                 if (number) {
-                    const rect = card.getBoundingClientRect();
-                    // Nur animieren, wenn im Viewport
-                    if (rect.top < window.innerHeight && rect.bottom > 0) {
-                        // Parallax relativ zur Kartenposition
-                        const yPos = (window.innerHeight - rect.top) * 0.15;
+                    // Wir nutzen offsetTop statt getBoundingClientRect um Reflows zu minimieren
+                    // Das ist viel schneller!
+                    const cardTop = card.offsetTop;
+                    const viewportTop = scrolled;
+                    const windowHeight = window.innerHeight;
+                    
+                    // Einfache Prüfung ob im Viewport (grob)
+                    if (cardTop > viewportTop - 500 && cardTop < viewportTop + windowHeight) {
+                        const yPos = (viewportTop + windowHeight - cardTop) * 0.15;
                         number.style.transform = `translateY(${yPos}px)`;
                     }
                 }
             });
-        });
-
-        // --- SCROLL VELOCITY DETECTION FOR MARQUEE ---
-        let lastScrollY = window.scrollY;
-        let scrollTimeout;
-
-        window.addEventListener('scroll', () => {
-            const currentScrollY = window.scrollY;
-            const delta = currentScrollY - lastScrollY;
-            
-            // Richtung und Geschwindigkeit anpassen
-            // Faktor 0.15 bestimmt wie stark der Scroll die Laufschrift beschleunigt
-            if (window.marqueeInitialized) {
-                window.marqueeTargetSpeed = delta > 0 ? 3 + (delta * 0.05) : -3 + (delta * 0.05);
-            }
-            
-            lastScrollY = currentScrollY;
-
-            // Nach Scroll-Ende zurück zur normalen Geschwindigkeit (nach links = positiv)
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                if (window.marqueeInitialized) {
-                    window.marqueeTargetSpeed = 1; // Immer langsam nach links im Ruhezustand
-                }
-            }, 100);
-        });
+        }
     }
 
     // --- EASTER EGG: KONAMI CODE ---
