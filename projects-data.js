@@ -76,6 +76,42 @@ const projectsData = [
         themeColor: "#ffb300" // Amber
     },
     {
+        title: "Vault Transfer",
+        description: "🚧 In Arbeit: Unbegrenzter File-Transfer via WebRTC. Peer-to-Peer, Ende-zu-Ende verschlüsselt und ohne Cloud-Upload Limits.",
+        link: "#", // Hier später dein Link
+        isPlaceholder: true,
+        icon: {
+            type: "svg",
+            // Animiertes Schwarzes Loch (Akkretionsscheibe rotiert)
+            content: `<svg viewBox="0 0 100 100" overflow="visible">
+                <defs>
+                    <linearGradient id="accretion_disk" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#00e5ff" stop-opacity="0" />
+                        <stop offset="50%" stop-color="#00e5ff" />
+                        <stop offset="100%" stop-color="#00e5ff" stop-opacity="0" />
+                    </linearGradient>
+                    <filter id="glow_blue">
+                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+                <!-- Swirling Particles -->
+                <g>
+                    <circle cx="50" cy="50" r="35" stroke="url(#accretion_disk)" stroke-width="3" fill="none" stroke-dasharray="60 120" stroke-linecap="round" filter="url(#glow_blue)">
+                        <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="3s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="50" cy="50" r="28" stroke="url(#accretion_disk)" stroke-width="2" fill="none" stroke-dasharray="40 90" stroke-linecap="round" opacity="0.7">
+                        <animateTransform attributeName="transform" type="rotate" from="360 50 50" to="0 50 50" dur="5s" repeatCount="indefinite"/>
+                    </circle>
+                </g>
+                <!-- Event Horizon -->
+                <circle cx="50" cy="50" r="18" fill="#000" stroke="#00e5ff" stroke-width="1" opacity="0.9" />
+            </svg>`,
+            bgColor: "#050505"
+        },
+        themeColor: "#00e5ff" // Cyan / Electric Blue
+    },
+    {
         title: "Demnächst",
         description: "Hier entsteht bald ein weiteres spannendes Projekt.",
         link: "#",
