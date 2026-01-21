@@ -495,7 +495,7 @@ p {
 
 .project-card:nth-child(even) .card-number {
     right: auto;
-    left: -20px;
+    left: 20px;
 }
 
 .project-card:nth-child(even) .btn-link {
@@ -507,10 +507,10 @@ p {
 /* Die große Nummer im Hintergrund (jetzt echtes Element für Parallax) */
 .card-number {
     position: absolute;
-    right: -20px;
+    right: 20px;
     top: -40px;
     font-family: 'Outfit', sans-serif;
-    font-size: 12rem;
+    font-size: 10rem;
     font-weight: 800;
     font-style: italic;
     color: transparent; /* Outline Style */
@@ -602,8 +602,8 @@ p {
 }
 
 .card-icon {
-    width: 80px;
-    height: 80px;
+    width: 100px; /* Größer für mehr Impact */
+    height: 100px;
     flex-shrink: 0;
     border-radius: 4px;
     background: #000;
@@ -614,11 +614,14 @@ p {
     z-index: 1;
     position: relative;
     overflow: hidden;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
 }
 
 /* Eleganter Zoom Effekt beim Hover über Icon */
 .project-card:hover .card-icon {
     border-color: var(--theme-color);
+    transform: scale(1.1) rotate(-3deg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .card-icon img {
@@ -807,15 +810,7 @@ p {
 
     /* Auf Mobile die Nummern etwas kleiner und transparenter */
     .card-number {
-        font-size: 6rem;
-        top: -20px;
-        right: 0;
-        opacity: 0.3;
-    }
-    
-    .project-card:nth-child(even) .card-number {
-        left: auto;
-        right: 0;
+        display: none;
     }
     
     /* Button volle Breite auf Mobile */
@@ -865,13 +860,106 @@ p {
     100% { background-position: 400%; }
 }
 
+/* --- TOAST NOTIFICATION (Party Mode) --- */
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid var(--primary);
+    color: #fff;
+    padding: 16px 32px;
+    border-radius: 4px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    box-shadow: 0 0 30px var(--primary-glow);
+    z-index: 20001;
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(10px);
+}
+
+.toast-notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* --- KONFETTI --- */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    z-index: 20000;
+    pointer-events: none;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); }
+}
+
 /* Footer */
 footer {
     margin-top: auto;
-    padding-top: 60px;
+    padding: 120px 20px 60px 20px;
     text-align: center;
-    opacity: 0.6;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-content h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(3rem, 10vw, 6rem);
+    text-transform: uppercase;
+    font-style: italic;
+    margin-bottom: 20px;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+    transition: all 0.5s ease;
+    line-height: 1;
+}
+
+footer:hover h2 {
+    color: #fff;
+    text-shadow: 0 0 40px var(--primary-glow);
+}
+
+.footer-content p {
+    margin-bottom: 40px;
+    opacity: 0.7;
+}
+
+.footer-cta {
+    display: inline-block;
+    font-size: 1.2rem;
+    padding: 18px 40px;
+    background: #fff;
+    color: #000;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.footer-cta:hover {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 40px var(--primary-glow);
+}
+
+.footer-bottom {
+    margin-top: 80px;
     font-size: 0.9rem;
+    opacity: 0.4;
 }
 
 /* Mobile Anpassung für Profil */

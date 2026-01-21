@@ -25,6 +25,57 @@ function initMagneticElements() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- CONSOLE LOADING ANIMATION ---
+    setTimeout(() => {
+        let progress = 0;
+        const systemLogs = [
+            "Loading Kernel Modules...",
+            "Mounting File System...",
+            "Decrypting User Data...",
+            "Establishing Secure Handshake...",
+            "Verifying Integrity...",
+            "Allocating Memory Blocks...",
+            "Initializing GPU Drivers...",
+            "Compiling Shaders...",
+            "Optimizing Assets...",
+            "Connecting to Neural Net..."
+        ];
+
+        const interval = setInterval(() => {
+            progress += Math.floor(Math.random() * 5) + 2;
+            if (progress > 100) progress = 100;
+
+            console.clear();
+            
+            // Ladebalken generieren
+            const barLength = 30;
+            const filledLength = Math.round((progress / 100) * barLength);
+            const bar = '█'.repeat(filledLength) + '░'.repeat(barLength - filledLength);
+            
+            // Zufälligen Log auswählen für den Matrix-Effekt
+            const currentLog = systemLogs[Math.floor(Math.random() * systemLogs.length)];
+            console.log(`%c[SYSTEM] ${currentLog}`, "color: #0f0; font-family: monospace;");
+            console.log(`%cDownloading Resources: [${bar}] ${progress}%`, "color: #0f0; font-family: monospace; font-weight: bold;");
+
+            if (progress === 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    console.clear();
+                    console.log(
+                        "%c" +
+                        "██╗  ██╗ █████╗ ███╗   ██╗███╗   ██╗███████╗██╗  ██╗███████╗███╗   ██╗\n" +
+                        "██║  ██║██╔══██╗████╗  ██║████╗  ██║██╔════╝██║ ██╔╝██╔════╝████╗  ██║\n" +
+                        "███████║███████║██╔██╗ ██║██╔██╗ ██║█████╗  █████╔╝ █████╗  ██╔██╗ ██║\n" +
+                        "██╔══██║██╔══██║██║╚██╗██║██║╚██╗██║██╔══╝  ██╔═██╗ ██╔══╝  ██║╚██╗██║\n" +
+                        "██║  ██║██║  ██║██║ ╚████║██║ ╚████║███████╗██║  ██╗███████╗██║ ╚████║\n" +
+                        "╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝",
+                        "color: #d946ef; font-weight: bold; font-size: 10px; text-shadow: 0 0 10px rgba(217, 70, 239, 0.8);"
+                    );
+                }, 500);
+            }
+        }, 80);
+    }, 500);
+
     // --- CINEMATIC PRELOADER ---
     const preloader = document.querySelector('.preloader');
     const counter = document.querySelector('.preloader-counter');
@@ -200,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- INITIALISIERUNG DER NEUEN EFFEKTE ---
         
         // 1. Magnetic Buttons aktivieren (auch für Header Links)
-        document.querySelectorAll('.social-links a, .profile-link').forEach(el => el.classList.add('magnetic'));
+        document.querySelectorAll('.social-links a, .profile-link, .footer-cta').forEach(el => el.classList.add('magnetic'));
         initMagneticElements();
 
         // 2. High-Performance Scroll Loop
@@ -304,10 +355,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Einfache Prüfung ob im Viewport (grob)
                     if (cardTop > viewportTop - 500 && cardTop < viewportTop + windowHeight) {
-                        const yPos = (viewportTop + windowHeight - cardTop) * 0.15;
+                        const yPos = (viewportTop + windowHeight - cardTop) * 0.05;
                         number.style.transform = `translateY(${yPos}px)`;
                     }
                 }
+            });
+        }
+
+        // --- BACK TO TOP BUTTON ---
+        const backToTopBtn = document.querySelector('.back-to-top');
+        if (backToTopBtn) {
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             });
         }
     }
@@ -316,16 +378,64 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tippe: Hoch, Hoch, Runter, Runter, Links, Rechts, Links, Rechts, B, A
     const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
     let kIndex = 0;
+    let confettiInterval;
+
+    // Hilfsfunktionen für Party Mode
+    function createConfetti() {
+        // Neon-Farben passend zum Theme (Lila, Cyan, Pink, Grün, Blau)
+        const colors = ['#d946ef', '#6366f1', '#2196f3', '#4caf50', '#ffb300', '#ff00ff', '#00ffff'];
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        confetti.style.opacity = Math.random();
+        document.body.appendChild(confetti);
+        
+        // Entfernen nach Animation
+        setTimeout(() => confetti.remove(), 5000);
+    }
+
+    function startConfetti() {
+        if (!confettiInterval) confettiInterval = setInterval(createConfetti, 50);
+    }
+
+    function stopConfetti() {
+        clearInterval(confettiInterval);
+        confettiInterval = null;
+        document.querySelectorAll('.confetti').forEach(c => c.remove());
+    }
+
+    function showToast(message) {
+        let toast = document.querySelector('.toast-notification');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        // Auto-Hide nach 3 Sekunden
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
 
     document.addEventListener('keydown', (e) => {
         if (e.key === konamiCode[kIndex]) {
             kIndex++;
             if (kIndex === konamiCode.length) {
                 document.body.classList.toggle('party-mode');
-                const msg = document.body.classList.contains('party-mode') ? "🕹️ Cheat Code aktiviert! Party Mode ON!" : "Party Mode OFF";
-                console.log(msg); // Kleines Feedback in der Konsole
+                const isParty = document.body.classList.contains('party-mode');
                 
-                // Optional: Kurzes visuelles Feedback (z.B. Titel wackeln lassen)
+                if (isParty) {
+                    showToast("🎉 Partymodus aktiviert!");
+                    startConfetti();
+                } else {
+                    showToast("Partymodus deaktiviert");
+                    stopConfetti();
+                }
+                
+                // Titel wackeln lassen
                 const h1 = document.querySelector('h1');
                 if(h1) {
                     h1.style.animation = 'none';
