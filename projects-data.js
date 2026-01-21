@@ -19,14 +19,14 @@
 
 const projectsData = [
     {
-        title: "AI Kalorien Scanner",
-        description: "Erkennt Gerichte per Foto, schätzt Kalorien & Makros mit KI und speichert deine Tagesbilanz lokal & sicher.",
+        title: "NutriScan AI",
+        description: "Dein intelligenter Ernährungs-Coach: Analysiert Essen per Foto (KI), scannt Barcodes und synchronisiert deine Fortschritte sicher in der Cloud.",
         link: "https://nutri-scan.hanneken.cloud",
         icon: {
             type: "svg",
-            // Das Icon aus deiner App, leicht angepasst (eindeutige ID für den Gradienten)
-            content: `<svg viewBox="0 0 512 512"><defs><linearGradient id="grad_nutri" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#30d158"/><stop offset="100%" stop-color="#0a84ff"/></linearGradient></defs><rect width="512" height="512" rx="120" fill="#050505"/><path d="M130 130 L200 130 M130 130 L130 200" stroke="url(#grad_nutri)" stroke-width="36" stroke-linecap="round" fill="none"/><path d="M382 130 L312 130 M382 130 L382 200" stroke="url(#grad_nutri)" stroke-width="36" stroke-linecap="round" fill="none"/><path d="M130 382 L200 382 M130 382 L130 312" stroke="url(#grad_nutri)" stroke-width="36" stroke-linecap="round" fill="none"/><path d="M382 382 L312 382 M382 382 L382 312" stroke="url(#grad_nutri)" stroke-width="36" stroke-linecap="round" fill="none"/><path d="M256 160 Q256 256 352 256 Q256 256 256 352 Q256 256 160 256 Q256 256 256 160 Z" fill="#ffffff"/></svg>`,
-            bgColor: "#050505"
+            // Das offizielle Icon aus deiner App (Blue/Purple Gradient)
+            content: `<svg viewBox="0 0 512 512"><defs><linearGradient id="grad_nutri_real" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0a84ff"/><stop offset="100%" stop-color="#bf5af2"/></linearGradient></defs><rect width="512" height="512" rx="128" fill="#1c1c1e"/><path d="M160 96h-32a32 32 0 0 0-32 32v32m0 192v32a32 32 0 0 0 32 32h32m192 0h32a32 32 0 0 0 32-32v-32m0-192v-32a32 32 0 0 0-32-32h-32" fill="none" stroke="url(#grad_nutri_real)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/><path d="M256 120c0 0 30 96 136 136 0 0-106 40-136 136 0 0-30-96-136-136 0 0 106-40 136-136z" fill="url(#grad_nutri_real)"/></svg>`,
+            bgColor: "#1c1c1e"
         }
     },
     {
