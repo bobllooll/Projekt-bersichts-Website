@@ -76,10 +76,10 @@ const projectsData = [
         themeColor: "#ffb300" // Amber
     },
     {
-        title: "Vault Transfer",
-        description: "🚧 In Arbeit: Unbegrenzter File-Transfer via WebRTC. Peer-to-Peer, Ende-zu-Ende verschlüsselt und ohne Cloud-Upload Limits.",
-        link: "#", // Hier später dein Link
-        isPlaceholder: true,
+        title: "Hanneken.Cloud",
+        description: "High-Speed LAN Transfer. Teile Dateien unbegrenzt, verschlüsselt und direkt zwischen Geräten im selben WLAN – ohne Internetzwang.",
+        link: "https://transfer.hanneken.cloud",
+        isPlaceholder: false,
         icon: {
             type: "svg",
             // Animiertes Schwarzes Loch (Akkretionsscheibe rotiert)
