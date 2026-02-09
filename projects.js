@@ -3,17 +3,17 @@
 // --- MAGNETIC BUTTONS LOGIC ---
 function initMagneticElements() {
     const magnets = document.querySelectorAll('.magnetic');
-    
+
     magnets.forEach((magnet) => {
         magnet.addEventListener('mousemove', (e) => {
             const rect = magnet.getBoundingClientRect();
             // Mausposition relativ zur Mitte des Buttons
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
-            
+
             // Bewegungsfaktor (je höher, desto stärker der Magnet)
             const strength = 0.5;
-            
+
             magnet.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
         });
 
@@ -46,12 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (progress > 100) progress = 100;
 
             console.clear();
-            
+
             // Ladebalken generieren
             const barLength = 30;
             const filledLength = Math.round((progress / 100) * barLength);
             const bar = '█'.repeat(filledLength) + '░'.repeat(barLength - filledLength);
-            
+
             // Zufälligen Log auswählen für den Matrix-Effekt
             const currentLog = systemLogs[Math.floor(Math.random() * systemLogs.length)];
             console.log(`%c[SYSTEM] ${currentLog}`, "color: #0f0; font-family: monospace;");
@@ -81,19 +81,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const counter = document.querySelector('.preloader-counter');
     const faviconLink = document.querySelector("link[rel~='icon']");
     let count = 0;
-    
+
     // Simulierter Ladevorgang
     const loadInterval = setInterval(() => {
         // Zufällige Sprünge für Realismus
-        count += Math.floor(Math.random() * 5) + 1; 
+        count += Math.floor(Math.random() * 5) + 1;
         if (count > 100) count = 100;
-        
+
         if (counter) counter.textContent = count + '%';
-        
+
         // --- FAVICON ANIMATION (Ladebalken im Tab) ---
         if (faviconLink) {
             // Umfang des Rechtecks im SVG (ca. 366px)
-            const perimeter = 366; 
+            const perimeter = 366;
             const dash = (count / 100) * perimeter;
             // Wir aktualisieren den SVG-String direkt im href
             const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23050505' stroke='%23d946ef' stroke-width='6' stroke-dasharray='${dash} 400' /><text x='50' y='75' font-family='sans-serif' font-weight='900' font-size='65' text-anchor='middle' fill='%23ffffff'>H</text></svg>`;
@@ -117,11 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
     else greeting = "Wunderschönen guten Abend";
 
     // Text sanft aktualisieren
-    if(headerP) headerP.textContent = `${greeting}! Hier ist eine Übersicht meiner Projekte.`;
+    if (headerP) headerP.textContent = `${greeting}! Hier ist eine Übersicht meiner Projekte.`;
 
     // --- PROJEKTE RENDERN ---
     const grid = document.querySelector('.project-grid');
-    
+
     if (grid && typeof projectsData !== 'undefined') {
         grid.innerHTML = ''; // Container leeren
 
@@ -129,15 +129,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Element erstellen (div für Platzhalter, a für Links)
             const card = document.createElement(project.isPlaceholder ? 'div' : 'a');
             card.className = `project-card ${project.isPlaceholder ? 'placeholder' : ''}`;
-            
+
             if (!project.isPlaceholder) {
                 card.href = project.link;
             }
-            
+
             // Theme Color setzen (für CSS Variablen)
             const themeColor = project.themeColor || '#d946ef';
             card.style.setProperty('--theme-color', themeColor);
-            
+
             // Zufällige Tech-ID generieren (für den Sci-Fi Look)
             const techId = `ID-${Math.floor(Math.random() * 900) + 100}-${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`;
             card.dataset.techId = techId; // Speichern für Scramble Effekt
@@ -167,53 +167,120 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
+            // Referenz zum Button für Feedback-Status speichern
+            const linkBtn = card.querySelector('.btn-link');
+
+            // --- URL CHECK & FALLBACK LOGIC ---
+            if (!project.isPlaceholder) {
+                card.addEventListener('click', async (e) => {
+                    e.preventDefault();
+
+                    // Button Feedback (Lade-Status)
+                    const originalText = linkBtn ? linkBtn.textContent : '';
+                    if (linkBtn) {
+                        linkBtn.textContent = "Verbinde...";
+                        linkBtn.style.opacity = "0.7";
+                    }
+                    card.style.cursor = "wait";
+
+                    const fallbackUrl = project.fallbackLink;
+                    const targetUrl = project.link;
+
+                    // Wenn kein Fallback definiert ist, direkt weiterleiten
+                    if (!fallbackUrl) {
+                        window.location.href = targetUrl;
+                        return;
+                    }
+
+                    try {
+                        // Versuch die URL zu erreichen (Timeout 2s)
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+                        // mode: 'no-cors' erlaubt opaque responses. 
+                        // Wir prüfen nur auf Netzwerk-Fehler (DNS, Timeout, Refused).
+                        // HTTP Fehler (404, 500) werden als success gewertet bei no-cors,
+                        // aber das ist meist okay, da wir ja "erreichbarkeit" testen.
+                        await fetch(targetUrl, {
+                            method: 'HEAD',
+                            mode: 'no-cors',
+                            signal: controller.signal
+                        });
+
+                        clearTimeout(timeoutId);
+                        // Erfolg -> Original URL
+                        window.location.href = targetUrl;
+
+                    } catch (error) {
+                        console.warn(`Haupt-URL ${targetUrl} nicht erreichbar, nutze Fallback: ${fallbackUrl}`, error);
+                        // Fehler -> Fallback URL
+                        // Kurzes Feedback für User
+                        if (linkBtn) linkBtn.textContent = "Nutze Fallback...";
+
+                        // Kurze Verzögerung für UX
+                        setTimeout(() => {
+                            window.location.href = fallbackUrl;
+                        }, 500);
+                    } finally {
+                        // Reset UI (falls User zurückkommt oder Navigation abbricht)
+                        setTimeout(() => {
+                            if (linkBtn) {
+                                linkBtn.textContent = originalText;
+                                linkBtn.style.opacity = "1";
+                            }
+                            card.style.cursor = "pointer";
+                        }, 3000);
+                    }
+                });
+            }
+
             // --- 3D TILT EFFEKT ---
             // Macht die Karten interaktiv, als wären sie physische Objekte
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                
+
                 // Mitte der Karte berechnen
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
-                
+
                 // Für den Spotlight-Effekt im CSS
                 card.style.setProperty('--mouse-x', `${x}px`);
                 card.style.setProperty('--mouse-y', `${y}px`);
 
                 // Rotation berechnen (max +/- 8 Grad für subtilen Effekt)
                 // Wir nutzen einen sehr subtilen Tilt + Scale für das "Floating"-Gefühl
-                const rotateX = ((y - centerY) / centerY) * -2; 
+                const rotateX = ((y - centerY) / centerY) * -2;
                 const rotateY = ((x - centerX) / centerX) * 2;
 
                 // Transition für Transform entfernen, damit es der Maus sofort folgt
                 // Box-Shadow behält die weiche Transition
                 card.style.transition = 'box-shadow 0.3s ease, transform 0.05s linear';
-                
+
                 // Scale 1.03 hier festlegen, damit es konsistent mit dem Hover-Status ist
                 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
-                
+
                 // --- TECH ID SCRAMBLE EFFECT ---
                 const techIdEl = card.querySelector('.tech-id');
-                if(techIdEl && !techIdEl.dataset.animating) {
+                if (techIdEl && !techIdEl.dataset.animating) {
                     techIdEl.dataset.animating = "true";
                     let iterations = 0;
                     const originalText = card.dataset.techId;
-                    
+
                     const interval = setInterval(() => {
                         techIdEl.innerText = originalText.split("")
                             .map((letter, index) => {
-                                if(index < iterations) return originalText[index];
+                                if (index < iterations) return originalText[index];
                                 return String.fromCharCode(65 + Math.floor(Math.random() * 26));
                             })
                             .join("");
-                        
-                        if(iterations >= originalText.length) {
+
+                        if (iterations >= originalText.length) {
                             clearInterval(interval);
                             techIdEl.dataset.animating = "";
                         }
-                        iterations += 1/2; // Geschwindigkeit des Entschlüsselns
+                        iterations += 1 / 2; // Geschwindigkeit des Entschlüsselns
                     }, 30);
                 }
             });
@@ -249,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // --- INITIALISIERUNG DER NEUEN EFFEKTE ---
-        
+
         // 1. Magnetic Buttons aktivieren (auch für Header Links)
         document.querySelectorAll('.social-links a, .profile-link, .footer-cta').forEach(el => el.classList.add('magnetic'));
         initMagneticElements();
@@ -277,21 +344,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.marqueeSpeed = 1; // Basisgeschwindigkeit
                     window.marqueeTargetSpeed = 1;
                     window.marqueeInitialized = true;
-                    
+
                     // Animation Loop
                     function animateMarquee() {
                         // Smooth Interpolation für Geschwindigkeit
                         window.marqueeSpeed += (window.marqueeTargetSpeed - window.marqueeSpeed) * 0.1;
-                        
+
                         window.marqueePos -= window.marqueeSpeed;
-                        
+
                         // Reset Logic (Loop)
                         // Wir nehmen an, der Inhalt wurde verdoppelt, also resetten wir bei der Hälfte
                         const halfWidth = marqueeContent.scrollWidth / 2;
-                        
+
                         if (window.marqueePos <= -halfWidth) window.marqueePos = 0;
                         if (window.marqueePos > 0) window.marqueePos = -halfWidth;
-                        
+
                         marqueeContent.style.transform = `translateX(${window.marqueePos}px)`;
                         requestAnimationFrame(animateMarquee);
                     }
@@ -309,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Wir berechnen Delta hier grob, für Marquee reicht das
                 // Für präzise Physik nutzen wir die Render-Loop
                 window.marqueeTargetSpeed = 3; // Standard Speed bei Bewegung
-                
+
                 clearTimeout(scrollTimeout);
                 scrollTimeout = setTimeout(() => {
                     window.marqueeTargetSpeed = 1; // Zurück zu langsam
@@ -329,11 +396,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Die optimierte Render-Funktion
         function updateScrollVisuals(scrolled) {
             // Hero Parallax
-            if(header) {
+            if (header) {
                 // Nur berechnen wenn Header noch sichtbar ist (spart CPU)
                 if (scrolled < 1000) {
                     header.style.opacity = 1 - (scrolled / 700);
-                    header.style.transform = `translateY(${scrolled * 0.4}px) scale(${1 - scrolled/5000})`;
+                    header.style.transform = `translateY(${scrolled * 0.4}px) scale(${1 - scrolled / 5000})`;
                 }
             }
 
@@ -352,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const cardTop = card.offsetTop;
                     const viewportTop = scrolled;
                     const windowHeight = window.innerHeight;
-                    
+
                     // Einfache Prüfung ob im Viewport (grob)
                     if (cardTop > viewportTop - 500 && cardTop < viewportTop + windowHeight) {
                         const yPos = (viewportTop + windowHeight - cardTop) * 0.05;
@@ -391,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
         confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
         confetti.style.opacity = Math.random();
         document.body.appendChild(confetti);
-        
+
         // Entfernen nach Animation
         setTimeout(() => confetti.remove(), 5000);
     }
@@ -415,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         toast.textContent = message;
         toast.classList.add('show');
-        
+
         // Auto-Hide nach 3 Sekunden
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
@@ -426,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (kIndex === konamiCode.length) {
                 document.body.classList.toggle('party-mode');
                 const isParty = document.body.classList.contains('party-mode');
-                
+
                 if (isParty) {
                     showToast("🎉 Partymodus aktiviert!");
                     startConfetti();
@@ -434,15 +501,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast("Partymodus deaktiviert");
                     stopConfetti();
                 }
-                
+
                 // Titel wackeln lassen
                 const h1 = document.querySelector('h1');
-                if(h1) {
+                if (h1) {
                     h1.style.animation = 'none';
                     h1.offsetHeight; /* Trigger reflow */
                     h1.style.animation = 'float 0.5s ease-in-out';
                 }
-                
+
                 kIndex = 0;
             }
         } else {
@@ -453,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DISCORD STATUS (via Lanyard) ---
     // 1. Tritt dem Lanyard Discord bei: https://discord.gg/lanyard
     // 2. Füge hier deine ID ein:
-    const DISCORD_USER_ID = '473915884088328222'; 
+    const DISCORD_USER_ID = '473915884088328222';
 
     async function updateDiscordStatus() {
         try {
@@ -463,11 +530,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 const status = data.data.discord_status; // online, idle, dnd, offline
                 const badge = document.querySelector('.status-badge');
-                
+
                 if (badge) {
                     // Alle Status-Klassen entfernen
                     badge.classList.remove('busy', 'idle', 'offline');
-                    
+
                     // Neue Klasse setzen
                     switch (status) {
                         case 'dnd':
@@ -490,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // --- PROFILBILD VOM DISCORD LADEN ---
                 const discordUser = data.data.discord_user;
                 const profileImg = document.querySelector('.profile-img');
-                
+
                 if (discordUser && discordUser.avatar && profileImg) {
                     const avatarUrl = `https://cdn.discordapp.com/avatars/${DISCORD_USER_ID}/${discordUser.avatar}.png?size=256`;
                     // Nur aktualisieren, wenn es noch nicht gesetzt ist (verhindert Flackern)
